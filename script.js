@@ -11,7 +11,7 @@ zoom: 9, // starting zoom
 let collision;
 // Fetch GeoJSON from GitHub and strore response
 // Fetch GeoJSON from URL and store response
-fetch('https://raw.githubusercontent.com/Adnarmstrng/Lab4/ggr472-lab4-main/data/pedcyc_collision_06-21.geojson')
+fetch('https://raw.githubusercontent.com/Adnarmstrng/Lab4/main/ggr472-lab4-main/data/pedcyc_collision_06-21.geojson')
     .then(response => response.json())
     .then(response => {
         console.log(response); //Check response in console
