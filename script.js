@@ -1,9 +1,9 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiYWlkYW5hcm1zdHJvbmciLCJhIjoiY2xzam1tczhoMnJqMzJpbzZ4OWh0bmI4dyJ9.2pEogvW_3XlwcsMh4kMfCQ'; //Add default public map token from your Mapbox account
 const map = new mapboxgl.Map({
-container: 'my-map', //this ID points to my map container so that CSS can display this across the whol website
-style: 'mapbox://styles/mapbox/streets-v12', //this is a street style but I could use any style
-center: [-79.375, 43.712], // starting position [lng, lat]
-zoom: 9, // starting zoom
+    container: 'my-map', //this ID points to my map container so that CSS can display this across the whol website
+    style: 'mapbox://styles/mapbox/streets-v12', //this is a street style but I could use any style
+    center: [-79.375, 43.712], // starting position [lng, lat]
+    zoom: 9, // starting zoom
 });
 // Adding Variables with input data
 let collision;
@@ -17,26 +17,66 @@ fetch('https://raw.githubusercontent.com/Adnarmstrng/Lab4/main/ggr472-lab4-main/
     });
 
 map.on('load', () => {
+
     let bboxgeojson;
     let bbox = turf.envelope(collision);
+    let bboxscaled = turf.transformScale(bbox, 1.10);
     bboxgeojson = {
-        "type" : "FeatureCollection",
-        "features": [bbox]
+        "type": "FeatureCollection",
+        "features": [bboxscaled]
     };
-map.addSource('collis-bbox', {
-    type: 'geojson',
-    data: bboxgeojson
-});
-map.addLayer({
-    "id" : "shbbox",
-    "type": "fill",
-    "source": "collis-bbox",
-    "paint": {
-        'fill-color': "red",
-        'fill-opacity': 0.5,
-        'fill-outline-color': "black"}
-});    
+
+    //Create HexGrid//
+
+    let bboxcoords = [bboxscaled.geometry.coordinates[0][0][0],
+    bboxscaled.geometry.coordinates[0][0][1],
+    bboxscaled.geometry.coordinates[0][2][0],
+    bboxscaled.geometry.coordinates[0][2][1]];
+    let hexgeojson = turf.hexGrid(bboxcoords, 0.5, { units: 'kilometers' });
+
+    // Collect properties from points//
+    let collishex = turf.collect(hexgeojson, collision, '_id', 'values');
+
+    // count
+    let maxcollis = 0;
+
+    collishex.features.forEach((feature) => {
+        feature.properties.COUNT = feature.properties.values.length
+        if (feature.properties.COUNT > maxcollis) {
+            console.log(feature);
+            maxcollis = feature.properties.COUNT
+        }
+    })
+
+    map.addSource('collis-hex', {
+        type: "geojson",
+        data: hexgeojson
+    });
+
+    map.addLayer({
+        'id': 'collis-hex-fill',
+        'type': 'fill',
+        'source': 'collis-hex',
+        'paint': {
+            'fill-color': [
+                'step',
+                ['get', 'COUNT'],
+                '#800026',
+                10, '#bd0026',
+                25, '#e31a1c'
+            ],
+            'fill-opacity': 0.5,
+            'fill-outline-color': 'white'
+        }
+    })
+
+    map.on('click', 'collis-hex-fill', (e) => {
+        new mapboxgl.Popup()
+            .setLngLat(e.lnglat)
+            .setHTML("<b>Collision Count: </> " + e.features[0].properties.COUNT)
+            .addTo(map);
+
+
+    })
 
 })
-console.log(bbox)
-console.log(bbox.geometry.coordninates)
