@@ -15,3 +15,28 @@ fetch('https://raw.githubusercontent.com/Adnarmstrng/Lab4/main/ggr472-lab4-main/
         console.log(response); //Check response in console
         collision = response; // Store geojson as variable using URL from fetch response
     });
+
+map.on('load', () => {
+    let bboxgeojson;
+    let bbox = turf.envelope(collision);
+    bboxgeojson = {
+        "type" : "FeatureCollection",
+        "features": [bbox]
+    };
+map.addSource('collis-bbox', {
+    type: 'geojson',
+    data: bboxgeojson
+});
+map.addLayer({
+    "id" : "shbbox",
+    "type": "fill",
+    "source": "collis-bbox",
+    "paint": {
+        'fill-color': "red",
+        'fill-opacity': 0.5,
+        'fill-outline-color': "black"}
+});    
+
+})
+console.log(bbox)
+console.log(bbox.geometry.coordninates)
