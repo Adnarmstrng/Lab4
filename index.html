@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab4</title>
+    <title>Lab4 Plotting Collisions</title>
     <!-- Mapbox -->
     <script src='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css' rel='stylesheet' />
@@ -21,8 +21,13 @@
     <div id='my-map' class='map'></div>
 
     <script src="script.js"></script>
-
-
+<!-- Building a hardcoded legend. This legend only has two entries so far. You can update this according to your dataset. Right now they dataset is not changing therefore I can hardcode it
+However, say my data was constantly being updated  then I would need to implement a JSS legend so that is takes data from the collisions and hexgrid variables and comes up with a legend based on my color scheme -->
+<div id="legend" class = 'legend-container'> 
+    <h4>Collisions</h4>
+    <div> <span style="background-color: #fd8d3c;"></span> #lower number of collisions</div>
+    <div> <span style="background-color: #800026;"></span> #higher number of collisions</div>
+</div>
 
 
 </body>
